@@ -7,121 +7,97 @@ namespace Snake
     {
         static char[,] field;
 
-        private static readonly PointReadOnly size;
-
+        private static readonly PointReadOnly size = new PointReadOnly(23, 12);
+        private static readonly PointReadOnly stepMove = new PointReadOnly(2, 1);
 
         private static Point startSnake;
         private static Point endSnake;
 
 
-        private static Queue<Move> moves;
+
+        private static Queue<Move> moves = new Queue<Move>();
+
+
+        // down - \u25BC; left - \u25C4; right - \u25BA; up - \u25B2
+        private static readonly Dictionary<Direction, char> dirToChar = new Dictionary<Direction, char>() { 
+            [Direction.Up]      = '\u25B2',
+            [Direction.Down]    = '\u25BC',
+            [Direction.Left]    = '\u25C4',
+            [Direction.Right]      = '\u25BA'
+        };
+
+        private static readonly Dictionary<ConsoleKey, Direction> keyToDir = new Dictionary<ConsoleKey, Direction>()
+        {
+            [ConsoleKey.W] = Direction.Up,
+            [ConsoleKey.S] = Direction.Down,
+            [ConsoleKey.A] = Direction.Left,
+            [ConsoleKey.D] = Direction.Right
+        };
+
 
 
         static SnakeProgram() 
         {
-            size = new PointReadOnly(20, 10);
-
             //moves.Enqueue(new Move());
 
         }
 
-
-        enum Direction
-        {
-            Up,
-            Right,
-            Down,
-            Left
-        }
-
-        private class Move 
-        {
-            public readonly PointReadOnly point;
-            public readonly Direction direction;
-            public int Length { get; private set; }
-
-            public Move(PointReadOnly point, Direction direction, int Length)
-            {
-                this.point = point;
-                this.direction = direction;
-                this.Length = Length;
-            }
-
-            public Move(int X, int Y, Direction direction, int Length) : this(new PointReadOnly(X, Y), direction, Length){ }
-
-            public void Dec() => 
-                Length += Length > 0 ? -1 : 0;
-
-            public void Inc() => 
-                Length++;
-
-        }
-
-        struct Point
-        {
-            public int X;
-            public int Y;
-
-            public Point(int X, int Y)
-            {
-                this.X = X;
-                this.Y = Y;
-            }
-        }
-
-
-        struct PointReadOnly { 
-            public readonly int X;
-            public readonly int Y;
-
-            public PointReadOnly(int X, int Y)
-            {
-                this.X = X;
-                this.Y = Y;
-            }
-        }
+        
 
 
         static void Main(string[] args)
         {
+            #region Test
             var console = Console.OutputEncoding;
             var system = System.Text.Encoding.Default;
 
-            Console.OutputEncoding = System.Text.Encoding.Default;
-            
 
+            Console.OutputEncoding = System.Text.Encoding.Default;
+            #endregion
+
+            Console.CursorVisible = false;
+
+            startSnake = new Point(2, size.Y / 2);
+            endSnake = startSnake;
 
             InitField();
+
+
+
+
             Draw();
 
         }
 
         static void InitField()
         {
-            /*
-            field = new char[size, size];
+            
+            field = new char[size.Y, size.X];
 
-            field[0, 0]                 = '\u250C';
-            field[0, size - 1]          = '\u2510';
-            field[size - 1, 0]          = '\u2514';
-            field[size - 1, size - 1]   = '\u2518';
+            field[0, 0]                     = '\u250C';
+            field[0, size.X - 1]            = '\u2510';
+            field[size.Y - 1, 0]            = '\u2514';
+            field[size.Y - 1, size.X - 1]   = '\u2518';
             
             //\u2500 - ; \u2502
 
-            for (int i = 1; i < size - 1; i++)
-            {
-                field[0, i] = field[size - 1, i] = '\u2500';
-                field[i, 0] = field[i, size - 1] = '\u2502';
-            }
+            
+
+            for (int i = 1; i < size.X - 1; i++)
+                field[0, i] = field[size.Y - 1, i] = '\u2500';
+
+            for (int i = 1; i < size.Y - 1; i++)
+                field[i, 0] = field[i, size.X - 1] = '\u2502';
 
 
-            for (int i = 1; i < size - 1; i++)
-                for (int j = 1; j < size - 1; j++)
-                    field[i, j] = 'o';
-            */
-            Test();
+            for (int i = 1; i < size.Y - 1; i++)
+                for (int j = 1; j < size.X - 1; j++)
+                    field[i, j] = j % 2 == 0 ? '\u25A0' : ' ';
+            
+            //Test();
         }
 
+        #region Testing
         static void Test()
         {
             // down - \u25BC; left - \u25C4; right - \u25BA; up - \u25B2
@@ -139,24 +115,20 @@ namespace Snake
                 { '\u2514', '\u2500', '\u2500'  , '\u2500'  , '\u2500'  , '\u2500'  , '\u2500'  , '\u2500'  , '\u2500'  , '\u2518' }
             };
         }
+        #endregion
 
         static void Draw()
         {
             Console.Clear();
-            /*
-            for (int i = 0; i < size; i++)
+            
+            for (int i = 0; i < size.Y; i++)
             {
-                for (int j = 0; j < size; j++)
-                {
+                for (int j = 0; j < size.X; j++)
                     Console.Write(field[i, j]);
-                    if(j != size - 1)
-                        Console.Write(i == 0 || i == size - 1 ? '\u2500' : ' ');
-                }
                     
-                if(i != size - 1)
+                if(i != size.Y - 1)
                     Console.WriteLine();
             }
-            */
         }
     }
 }
