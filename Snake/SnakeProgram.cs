@@ -19,11 +19,22 @@ namespace Snake
 
 
         // down - \u25BC; left - \u25C4; right - \u25BA; up - \u25B2
-        private static readonly Dictionary<Direction, char> dirToChar = new Dictionary<Direction, char>() { 
+        private static readonly Dictionary<Direction, char> dirToCharHead = new Dictionary<Direction, char>() { 
             [Direction.Up]      = '\u25B2',
             [Direction.Down]    = '\u25BC',
             [Direction.Left]    = '\u25C4',
-            [Direction.Right]      = '\u25BA'
+            [Direction.Right]   = '\u25BA'
+        };
+
+        private static readonly Dictionary<Direction, char> dirToChar = new Dictionary<Direction, char>() { 
+            [Direction.LeftToUp]    = '\u255D',
+            [Direction.LeftToDown]  = '\u2557',
+            [Direction.RightToUp]   = '\u255A',
+            [Direction.RightToDown] = '\u2554',
+            [Direction.Left]        = '\u2550',
+            [Direction.Right]       = '\u2550',
+            [Direction.Up]          = '\u2551',
+            [Direction.Down]        = '\u2551'
         };
 
         private static readonly Dictionary<ConsoleKey, Direction> keyToDir = new Dictionary<ConsoleKey, Direction>()
