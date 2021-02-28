@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace Snake
@@ -7,8 +8,8 @@ namespace Snake
     {
         static char[,] field;
 
-        private static readonly PointReadOnly size = new PointReadOnly(23, 12);
-        private static readonly PointReadOnly stepMove = new PointReadOnly(2, 1);
+        //private static readonly Point size = new Point(23, 12);
+        private static readonly Point stepMove = new Point(1, 1);
 
         private static Point startSnake;
         private static Point endSnake;
@@ -68,18 +69,91 @@ namespace Snake
 
             Console.CursorVisible = false;
 
-            startSnake = new Point(2, size.Y / 2);
-            endSnake = startSnake;
-
-            InitField();
-
+            startSnake = new Point(5, 5);
+            endSnake = new Point(2, 5);
+            //endSnake = startSnake;
 
 
+            Move currentMove = new Move(Direction.Right, 3);
+            moves.Enqueue(currentMove);
 
-            Draw();
+
+            Test1();
+
+            Direction direction = Direction.Right;
+
+            //int i = 0;
+
+            while (true)
+            {
+                if (ReadLastKey(out ConsoleKey key) && keyToDir.TryGetValue(key, out Direction newDir) && (newDir & Direction.HorOrVer) != (direction & Direction.HorOrVer))
+                {
+                    //Console.WriteLine($"\nLast dir: {direction};\nNew dir: {newDir};\nRotate char: {(direction | newDir) & Direction.Rotate};");
+                    //direction = newDir;
+                }
+                else
+                {
+                    currentMove.Inc();
+                    Draw(startSnake, dirToChar[direction]);
+                    startSnake = GetNewPoint(startSnake, stepMove, direction);
+                    Draw(startSnake, dirToCharHead[direction]);
+
+                    Move end = moves.Peek();
+                    end.Dec();
+                    Draw(endSnake, ' ');
+                    endSnake = GetNewPoint(endSnake, stepMove, end.direction);
+                }
+
+
+                //Console.WriteLine($"Tick: {i++}\n");
+
+                Task.Delay(1000).Wait();
+            }
+
+
+
 
         }
 
+        static void Draw(Point point, char drawChar)
+        {
+            Console.CursorLeft = point.X;
+            Console.CursorTop = point.Y;
+            Console.Write(drawChar);
+        }
+
+        static Point GetNewPoint(Point point, Point offset, Direction direction) => direction switch { 
+            Direction.Up    => new Point(point.X, point.Y - offset.Y),
+            Direction.Down  => new Point(point.X, point.Y + offset.Y),
+            Direction.Left  => new Point(point.X - offset.X, point.Y),
+            Direction.Right => new Point(point.X + offset.X, point.Y),
+            _               => point
+        };
+
+        static bool ReadLastKey(out ConsoleKey key)
+        {
+            key = ConsoleKey.NoName;
+
+            if (!Console.KeyAvailable)
+                return false;
+
+            while (Console.KeyAvailable)
+                key = Console.ReadKey(true).Key;
+
+            return true;
+        }
+
+        static void Test1()
+        {
+            Console.CursorLeft = 2;
+            Console.CursorTop = 5;
+            Console.Write(dirToChar[Direction.Right]);
+            Console.Write(dirToChar[Direction.Right]);
+            Console.Write(dirToChar[Direction.Right]);
+            Console.Write(dirToCharHead[Direction.Right]);
+        }
+
+        /*
         static void InitField()
         {
             
@@ -107,7 +181,7 @@ namespace Snake
             
             //Test();
         }
-
+        */
         #region Testing
         static void Test()
         {
@@ -127,7 +201,7 @@ namespace Snake
             };
         }
         #endregion
-
+        /*
         static void Draw()
         {
             Console.Clear();
@@ -141,5 +215,6 @@ namespace Snake
                     Console.WriteLine();
             }
         }
+        */
     }
 }

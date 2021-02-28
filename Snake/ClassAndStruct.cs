@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Snake
 {
-    enum Direction
+    enum Direction : byte
     {
         Up          = 0b0000_0011,
         Right       = 0b0011_0000,
@@ -15,26 +15,26 @@ namespace Snake
         LeftToUp    = 0b0100_0010,
         LeftToDown  = 0b0100_0100,
         RightToUp   = 0b0010_0010,
-        RightToDown = 0b0010_0100
+        RightToDown = 0b0010_0100,
+        Rotate      = 0b0110_0110,
+        HorOrVer    = 0b0001_0001
     }
 
     class Move
     {
-        public readonly PointReadOnly point;
         public readonly Direction direction;
         public int Length { get; private set; }
 
-        public Move(PointReadOnly point, Direction direction, int Length)
+        public Move(Direction direction, int Length)
         {
-            this.point = point;
             this.direction = direction;
             this.Length = Length;
         }
 
-        public Move(int X, int Y, Direction direction, int Length) : this(new PointReadOnly(X, Y), direction, Length) { }
+        //public Move(int X, int Y, Direction direction, int Length) : this(new PointReadOnly(X, Y), direction, Length) { }
 
         public void Dec() =>
-            Length += Length > 0 ? -1 : 0;
+            Length--;
 
         public void Inc() =>
             Length++;
@@ -51,19 +51,27 @@ namespace Snake
             this.X = X;
             this.Y = Y;
         }
-    }
 
+        public override bool Equals(object obj) =>
+            X == ((Point)obj).X && Y == ((Point)obj).Y;
 
-    struct PointReadOnly
-    {
-        public readonly int X;
-        public readonly int Y;
+        public override int GetHashCode() =>
+            base.GetHashCode();
 
-        public PointReadOnly(int X, int Y)
-        {
-            this.X = X;
-            this.Y = Y;
-        }
+        public static Point operator *(Point point1, Point point2) =>
+            new Point(point1.X * point2.X, point2.Y * point2.Y);
+
+        public static Point operator +(Point point1, Point point2) =>
+            new Point(point1.X + point2.X, point1.Y + point2.Y);
+
+        public static Point operator -(Point point1, Point point2) =>
+            new Point(point1.X - point2.X, point1.Y - point2.Y);
+
+        public static bool operator ==(Point point1, Point point2) =>
+            point1.X == point2.X && point1.Y == point2.Y;
+
+        public static bool operator !=(Point point1, Point point2) =>
+             point1.X != point2.X || point1.Y != point2.Y;
     }
 
 }
